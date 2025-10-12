@@ -222,14 +222,128 @@ tool/image_cleaner
 * Кастомные модули с изображениями могут не учитываться
 * Поддержка OCT Blog только при наличии таблиц `oct_blogarticle` и `oct_blogarticle_description`
 
-## Возможные улучшения
+Структура кода (что делает каждый файл)
+Для новичков: код — это инструкции для вашего сайта. Вот что делает каждый файл модуля:
+1. Контроллер: admin/controller/tool/image_cleaner.php
 
-* Выборочное удаление изображений (через галочки)
-* Логирование результатов сканирования и удаления
-* Поддержка мульти-магазинов
-* Фильтрация файлов по расширениям (.jpg, .png, .gif, .webp)
-* Режим «только проверка» без удаления
-* Поддержка кастомных модулей с изображениями
+Это "мозг" модуля, написан на PHP.
+Два главных метода:
+
+index():
+
+Загружает переводы ($this->load->language('tool/image_cleaner')).
+Устанавливает заголовок страницы (Очистка неиспользуемых изображений).
+Создаёт ссылки для кнопок "Проверить" (action=scan) и "Удалить" (action=delete).
+Загружает шаблон страницы (image_cleaner.twig).
+
+
+scanUnusedImages($delete):
+
+Собирает все используемые изображения из базы данных:
+
+Таблицы: product, product_image, category, banner_image, manufacturer, oct_blogarticle, oct_blogarticle_image.
+Поля: image (например, catalog/product.jpg).
+Описания: information_description, product_description, oct_blogarticle_description (ищет <img src="catalog/...").
+
+
+Сравнивает с файлами в /image/catalog/.
+Если $delete = true, удаляет ненужные файлы.
+Возвращает список результатов (пути файлов или сообщения).
+
+
+
+
+Как работает?
+
+Проверяет таблицы базы данных (например, SELECT image FROM oc_product).
+Парсит HTML-описания с помощью регулярных выражений (preg_match_all) для поиска путей (src, href).
+Нормализует пути: убирает image/, заменяет \ на /.
+Обходит папку /image/catalog/ с помощью RecursiveIteratorIterator.
+Игнорирует файлы из белого списка (placeholder.png, no_image.png, логотип).
+
+
+
+2. Языковые файлы
+
+Расположение: admin/language/*/tool/image_cleaner.php (ru-ru, en-gb, uk-ua).
+Содержат переводы всех текстов. Пример (русский):
+php$_['image_cleaner_title'] = 'Уборка в картинках'; // Название в меню
+$_['heading_title'] = 'Очистка неиспользуемых изображений'; // Заголовок
+$_['text_check'] = 'Проверить'; // Кнопка
+$_['text_delete'] = 'Удалить'; // Кнопка
+$_['text_warning'] = 'Удалить все неиспользуемые изображения? Это действие необратимо!';
+
+Аналогично для английского и украинского. Если добавить новый язык, создайте файл в admin/language/код_языка/tool/.
+
+3. Шаблон: admin/view/template/tool/image_cleaner.twig
+
+Это HTML-страница в формате Twig (стандарт ocStore для интерфейса).
+Содержит:
+
+Заголовок ({{ heading_title }}).
+Кнопки: "Проверить" ({{ scan_url }}) и "Удалить" ({{ delete_url }} с подтверждением).
+Область результатов: <pre> с прокруткой для списка файлов.
+Предупреждение о бэкапе ({{ text_backup }}).
+Ссылку на GitHub ({{ image_cleaner_github }}).
+
+
+
+4. Интеграция в меню: admin/controller/common/column_left.php
+
+Добавляет пункт меню в админку.
+Код (см. шаг 4 установки) загружает переводы и создаёт ссылку с иконкой корзины (fa-trash-o).
+OCMOD: Поскольку модуль не использует OCMOD, этот файл редактируется вручную. OCMOD позволил бы автоматизировать этот шаг.
+
+Технические детали (как работает под капотом)
+Для новичков: не пугайтесь технических терминов, это просто объяснение, как модуль делает свою работу.
+
+Сканирование:
+
+Проверяет таблицы базы данных:
+
+product, product_image, category, banner_image, manufacturer — стандартные таблицы ocStore.
+oct_blogarticle, oct_blogarticle_image — для блога OCTemplates.
+
+
+Извлекает пути изображений (например, catalog/product.jpg) из полей image.
+Парсит HTML в описаниях в таблицах information_description, product_description, oct_blogarticle_description:
+
+Ищет <img src="catalog/..." или href="catalog/..." с помощью preg_match_all.
+Также ищет пути вида image/catalog/....
+
+
+Убирает дубликаты и нормализует пути:
+php$p = str_replace('\\', '/', $p); // Заменяет \ на /
+$p = ltrim($p, '/'); // Убирает ведущий /
+if (strpos($p, 'image/') === 0) {
+    $p = substr($p, strlen('image/')); // Убирает image/
+}
+
+Сравнивает с файлами в /image/catalog/ с помощью RecursiveIteratorIterator.
+
+
+Белый список:
+
+Список файлов, которые нельзя удалять: catalog/placeholder.png, catalog/no_image.png.
+Проверяет логотип магазина:
+php$query_logo = $this->db->query("SELECT value FROM oc_setting WHERE key = 'config_logo' AND store_id = 0 LIMIT 1");
+Если логотип есть, добавляет его в белый список.
+
+
+Удаление:
+
+Проверяет права файла (is_writable).
+Удаляет с помощью unlink.
+Если успех — добавляет ✅, если ошибка — ❌.
+
+
+Безопасность:
+
+Использует user_token для защиты от CSRF (чтобы никто не запустил удаление без входа в админку).
+Проверяет существование таблиц перед запросами:
+php$check = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "table'");
+
+Игнорирует пустые описания и несуществующие папки.
 
 ## Требования
 
@@ -251,7 +365,7 @@ tool/image_cleaner
 
 ## Лицензия
 
-BSD License — [LICENSE](https://github.com/webitproff/oc-image_cleaner/blob/main/LICENSE)
+BSD License
 
 ## Поддержка и вклад
 
