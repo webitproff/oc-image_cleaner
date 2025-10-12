@@ -1,3 +1,319 @@
+# Image Cleaner Utility for ocStore / OpenCart
+## Unused Image Cleanup Module for ocStore
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/webitproff/oc-image_cleaner/blob/main/LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.1-green.svg)](https://github.com/webitproff/oc-image_cleaner/releases)
+[![ocStore Compatibility](https://img.shields.io/badge/ocStore-3.0.3.7-orange.svg)](https://ocstore.com/)
+[![PHP](https://img.shields.io/badge/PHP-7.3-blueviolet.svg)](https://www.php.net/releases/7_3_0.php)
+
+## Overview
+**Image Cleaner** is a free module for ocStore/OpenCart designed to locate and delete unused images from the `/image/catalog/` directory. This module helps keep your website optimized by freeing up disk space, removing images that are not linked to products, categories, banners, manufacturers, informational pages, or blogs. 
+
+The module has been thoroughly tested on a live website running on a local server and virtual hosting with **ocStore 3.0.3.7 + PHP 7.3**. It integrates into the admin panel, adding a menu item called "Image Cleanup" to initiate the scanning and deletion of unused images.
+
+## Introduction for Beginners
+**Image Cleaner Utility** is a straightforward module for ocStore (or OpenCart) online stores, designed to find and remove unnecessary images from the `/image/catalog/` directory.
+
+If you're unfamiliar with PHP, databases, FTP, or OCMOD, this document should guide you. Feel free to ask questions or consult a coding specialist.
+
+**Why is this needed?** When you add products, categories, or banners to your store, images are saved in the `/image/catalog/` directory. If you delete a product, its images may remain, becoming "junk" that takes up server space. Image Cleaner identifies these files and allows you to delete them via the admin panel without diving into code.
+
+**Important for beginners**: **Always back up your website** (all files + database) before using this module! Use FileZilla for files and phpMyAdmin for the database to ensure you can recover if something goes wrong.
+
+### Why It Matters
+Over time, online stores accumulate images that are no longer used. These files consume server space and can slow down or complicate backups. Image Cleaner safely removes such files, keeping your store efficient.
+
+## Key Features
+- Scans the `/image/catalog/` directory for unused images.
+- Deletes identified files with action confirmation.
+- Maintains a whitelist of critical files that cannot be deleted (`placeholder.png`, `no_image.png`, store logo).
+- Checks HTML descriptions of products, pages, and blogs for used images.
+- Displays scan and deletion results directly in the admin panel.
+- Includes CSRF token protection (`user_token`).
+- Verifies file permissions before deletion.
+- Multilingual support, adding a menu item named:
+  - "Image Cleanup" (English).
+  - "Уборка в картинках" (Russian).
+  - "Очищення зображень" (Ukrainian).
+- **OCMOD**: The module currently **does not use OCMOD** (ocStore/OpenCart’s modifier system). Installation requires manually copying files and making a simple code edit in one file (see "Detailed Installation Instructions").
+- Future OCMOD support is not planned; basic code-reading skills are sufficient, or consult someone with coding knowledge.
+
+## Module File Structure
+```
+admin/
+├── controller/
+│   └── tool/
+│       └── image_cleaner.php # Module logic
+├── language/
+│   ├── en-gb/tool/image_cleaner.php # English localization
+│   ├── ru-ru/tool/image_cleaner.php # Russian localization
+│   └── uk-ua/tool/image_cleaner.php # Ukrainian localization
+└── view/
+    └── template/
+        └── tool/
+            └── image_cleaner.twig # Interface display template
+```
+
+## Requirements (Check Before Installation)
+Ensure your store meets these requirements for the module to work:
+- **ocStore/OpenCart**: Version 3.0.3.7. If using a different version (e.g., OpenCart 3.x), test on a site copy.
+- **PHP**: Version 7.3. Check in the admin panel: "System" → "Server Info" → locate "PHP Version."
+- **File Access**: Requires FTP (via FileZilla) or access through your hosting panel (cPanel, DirectAdmin, etc.).
+- **File Permissions**: The `/image/catalog/` directory must be readable and writable (permissions 755 for folders, 644 for files, sometimes 777).
+- **Database**: MySQL or MariaDB, accessible via phpMyAdmin.
+- **Blog Module (Optional)**: If using OCTemplates blog (tables `oct_blogarticle_***`), the module will check its images.
+
+**How to check PHP version?**
+1. Log into the admin panel.
+2. Navigate to "System" → "Server Info."
+3. Look for "PHP Version." If it’s not 7.3, ask your hosting provider to update.
+
+## Detailed Installation Instructions
+Follow these steps to ensure the module works correctly, even if you're a complete beginner.
+
+### 1. Downloading the Module
+- Visit the project page on GitHub: [https://github.com/webitproff/oc-image_cleaner](https://github.com/webitproff/oc-image_cleaner).
+- Click "Code" → "Download ZIP."
+- Extract the archive on your computer.
+- Advanced users can use Git: `git clone https://github.com/webitproff/oc-image_cleaner.git`.
+
+### 2. Copying Files
+- Copy the contents of the `upload/` folder from the archive to the root directory of your ocStore/OpenCart site.
+- Simply copy the `admin` folder into your site’s root directory.
+- **Note**: Copying does not overwrite existing engine files.
+
+### 3. Adding the Menu Item to the Admin Panel
+- Open the file `admin/controller/common/column_left.php`.
+- Locate the line:
+  ```php
+  $this->load->language('common/column_left');
+  ```
+- After it, add:
+  ```php
+  $this->load->language('tool/image_cleaner'); // Loads language translations for the module
+  ```
+- Find the `$data['menus'][]` array (the admin menu list). After the first menu item (usually Dashboard):
+  ```php
+  // Menu
+  $data['menus'][] = array(
+      'id' => 'menu-dashboard',
+      'icon' => 'fa-dashboard',
+      'name' => $this->language->get('text_dashboard'),
+      'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
+      'children' => array()
+  );
+  ```
+- Add the following code after it:
+  ```php
+  // Start Image Cleaner menu item
+  $data['menus'][] = array(
+      'id' => 'menu-tool-image-cleaner',
+      'icon' => 'fa fa-trash-o',
+      'name' => $this->language->get('image_cleaner_title'),
+      'href' => $this->url->link('tool/image_cleaner', 'user_token=' . $this->session->data['user_token'], true),
+      'children' => array()
+  );
+  // End Image Cleaner menu item
+  ```
+- This adds the "Image Cleanup" menu item with a trash icon to the admin panel’s left column.
+
+### 4. Granting Module Access Permissions
+To make the module visible and functional, assign permissions:
+1. In the admin panel, go to **System → Users → User Groups**.
+2. Find the group to grant access to (usually `Administrator`) and click **Edit**.
+3. In the tabs:
+   - **Access Permission**
+   - **Modify Permission**
+4. Check the box for:
+   ```
+   tool/image_cleaner
+   ```
+   in both lists.
+5. Click **Save**. Users in this group will now see and use the module.
+
+### 5. Checking Image Folder Permissions
+- Ensure the `/image/catalog/` folder has read and write permissions.
+- Typically, permissions of `755` are sufficient. If the module cannot see or delete files, temporarily set to `777`.
+
+### 6. Clearing Cache
+- In the admin panel, go to **System → Tools → Cache Manager**.
+- Clear both the system cache and template cache.
+
+## Using the Module
+### 1. Accessing the Module
+- In the admin panel, locate the "Image Cleanup" menu item.
+- Click it to open the module interface.
+
+### 2. Scanning Images
+- Click the "Check" button.
+- The module scans the `/image/catalog/` directory and analyzes the database to identify unused images.
+- A list of unused images will appear after scanning.
+
+### 3. Deleting Images
+- If you’re sure you want to delete unused images, click the "Delete" button.
+- A warning will appear, as deletion is irreversible.
+- After confirmation, files not in use (and not in the whitelist) will be deleted.
+- Results will display: successfully deleted files and any that couldn’t be deleted.
+
+### 4. Backing Up
+- Before deleting, always back up the `/image/catalog/` folder.
+- This ensures you can restore files if important images are accidentally deleted.
+
+## How the Module Works
+- Checks database tables: `product`, `product_image`, `category`, `banner_image`, `manufacturer`, `information_description`, `product_description`, `oct_blogarticle`, `oct_blogarticle_description`.
+- Extracts image paths from `image` fields.
+- Analyzes HTML descriptions of products, pages, and blogs for `<img src>` and `<a href>` tags containing `/catalog/`.
+- Creates a list of used images, removing duplicates.
+- Compares files in `/image/catalog/` with this list.
+- Files not in the database and not in the whitelist are considered unused.
+- Upon deletion confirmation, files are removed if write permissions are available.
+
+## Whitelist
+Files that are never deleted:
+- `catalog/placeholder.png`
+- `catalog/no_image.png`
+- Store logo (`config_logo`)
+
+## Technical Details
+- **Version**: 2.0.1
+- **Compatibility**: ocStore 3.0.3.7, OpenCart 3.x
+- **PHP**: 7.3
+- Uses CSRF token (`user_token`) for security.
+- Checks file permissions before deletion.
+- Verifies table existence before SQL queries.
+
+## Limitations
+- Deletion is irreversible—always create a backup.
+- Custom modules with images may not be accounted for.
+- OCT Blog support requires `oct_blogarticle` and `oct_blogarticle_description` tables.
+
+## Code Structure
+### 1. Controller: `admin/controller/tool/image_cleaner.php`
+The core logic, written in PHP.
+
+#### `index()`
+- Loads translations: `$this->load->language('tool/image_cleaner')`.
+- Sets page title: "Cleanup Unused Images."
+- Creates button links:
+  - "Check" → `action=scan`
+  - "Delete" → `action=delete`
+- Loads the page template: `image_cleaner.twig`.
+
+#### `scanUnusedImages($delete)`
+- Collects all used images from the database:
+  - Tables: `product`, `product_image`, `category`, `banner_image`, `manufacturer`, `oct_blogarticle`, `oct_blogarticle_image`.
+  - Fields: `image` (e.g., `catalog/product.jpg`).
+  - Descriptions: `information_description`, `product_description`, `oct_blogarticle_description` (searches for `<img src="catalog/...">`).
+- Compares with files in `/image/catalog/`.
+- If `$delete = true`, deletes unused files.
+- Returns a list of results (file paths or messages).
+
+#### How It Works
+1. Queries database tables, e.g.:
+   ```sql
+   SELECT image FROM oc_product;
+   ```
+2. Parses HTML descriptions using regular expressions (`preg_match_all`) to find paths (`src`, `href`).
+3. Normalizes paths:
+   ```php
+   $p = str_replace('\\', '/', $p); // Replaces \ with /
+   $p = ltrim($p, '/'); // Removes leading /
+   if (strpos($p, 'image/') === 0) {
+       $p = substr($p, strlen('image/')); // Removes image/
+   }
+   ```
+4. Traverses `/image/catalog/` using `RecursiveIteratorIterator`.
+5. Ignores whitelisted files (`placeholder.png`, `no_image.png`, logo).
+
+### 2. Language Files
+Located in: `admin/language/*/tool/image_cleaner.php` (`ru-ru`, `en-gb`, `uk-ua`).
+
+Example (English):
+```php
+$_['image_cleaner_title'] = 'Image Cleanup'; // Menu title
+$_['heading_title'] = 'Cleanup Unused Images'; // Page title
+$_['text_check'] = 'Check'; // Button
+$_['text_delete'] = 'Delete'; // Button
+$_['text_warning'] = 'Delete all unused images? This action is irreversible!';
+```
+
+For other languages, similar files exist. To add a new language, create a file in `admin/language/language_code/tool/`.
+
+### 3. Template: `admin/view/template/tool/image_cleaner.twig`
+- Title: `{{ heading_title }}`
+- Buttons:
+  - "Check": `{{ scan_url }}`
+  - "Delete": `{{ delete_url }}` with confirmation
+- Results area: `<pre>` with scrolling
+- Backup warning: `{{ text_backup }}`
+- GitHub link: `{{ image_cleaner_github }}`
+
+### 4. Menu Integration: `admin/controller/common/column_left.php`
+- Adds the menu item to the admin panel.
+- Loads translations and creates a link with a trash icon (`fa-trash-o`).
+- Requires manual file editing since OCMOD is not used.
+
+## Technical Details
+### Scanning
+1. Checks database tables:
+   - Standard: `product`, `product_image`, `category`, `banner_image`, `manufacturer`
+   - OCTemplates Blog: `oct_blogarticle`, `oct_blogarticle_image`
+2. Extracts image paths (e.g., `catalog/product.jpg`) from `image` fields.
+3. Parses HTML in descriptions:
+   - Fields: `information_description`, `product_description`, `oct_blogarticle_description`
+   - Searches for `<img src="catalog/...">` and `href="catalog/..."` using `preg_match_all`
+   - Also searches for paths like `image/catalog/...`
+4. Removes duplicates and normalizes paths.
+5. Compares with files in `/image/catalog/` using `RecursiveIteratorIterator`.
+
+### Whitelist
+- Protected files: `catalog/placeholder.png`, `catalog/no_image.png`
+- Store logo checked via:
+  ```php
+  $query_logo = $this->db->query(
+      "SELECT value FROM oc_setting WHERE key = 'config_logo' AND store_id = 0 LIMIT 1"
+  );
+  ```
+- Logo is added to the whitelist if it exists.
+
+### Deletion
+- Checks file permissions: `is_writable`
+- Deletes via `unlink`
+- Status:
+  - ✅ — Success
+  - ❌ — Error
+
+### Security
+- Uses `user_token` for CSRF protection.
+- Checks table existence before queries:
+  ```php
+  $check = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "table'");
+  ```
+- Ignores empty descriptions and nonexistent folders.
+
+## Requirements
+- ocStore/OpenCart 3.0.3.7
+- PHP 7.3 or higher
+- Readable and writable `/image/catalog/` folder
+- Required database tables
+
+## Commands
+- Scan: `tool/image_cleaner?action=scan&user_token=...`
+- Delete: `tool/image_cleaner?action=delete&user_token=...`
+
+## Author
+- webitproff — [GitHub](https://github.com/webitproff)
+- Date: October 12, 2025
+- Project: [oc-image_cleaner](https://github.com/webitproff/oc-image_cleaner)
+
+## License
+BSD License
+
+## Support and Contributions
+- Create issues: [GitHub Issues](https://github.com/webitproff/oc-image_cleaner/issues)
+- Pull requests are welcome.
+
+___
+
 # Image Cleaner Utility для ocStore / OpenCart
 ## Модуль Очистки Неиспользуемых Изображений для ocStore
 [![Лицензия](https://img.shields.io/badge/лицензия-BSD-blue.svg)](https://github.com/webitproff/oc-image_cleaner/blob/main/LICENSE)
