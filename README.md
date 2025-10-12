@@ -10,6 +10,9 @@
 
 The module has been thoroughly tested on a live website running on a local server and virtual hosting with **ocStore 3.0.3.7 + PHP 7.3**. It integrates into the admin panel, adding a menu item called "Image Cleanup" to initiate the scanning and deletion of unused images.
 
+<img src="https://raw.githubusercontent.com/webitproff/oc-image_cleaner/refs/heads/main/Image-Cleaner-Utility.webp" alt="Image Cleaner Utility for ocStore / OpenCart">
+
+
 ## Introduction for Beginners
 **Image Cleaner Utility** is a straightforward module for ocStore (or OpenCart) online stores, designed to find and remove unnecessary images from the `/image/catalog/` directory.
 
