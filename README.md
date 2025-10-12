@@ -8,7 +8,7 @@
 ## Overview
 **Image Cleaner** is a free module for ocStore/OpenCart designed to locate and delete unused images from the `/image/catalog/` directory. This module helps keep your website optimized by freeing up disk space, removing images that are not linked to products, categories, banners, manufacturers, informational pages, or blogs. 
 
-The module has been thoroughly tested on a live website running on a local server and virtual hosting with **ocStore 3.0.3.7 + PHP 7.3**. It integrates into the admin panel, adding a menu item called "Image Cleanup" to initiate the scanning and deletion of unused images.
+The module has been thoroughly tested on a live website running on a [local server](https://abuyfile.com/ru/usersblog/open-server-6-and-opencart-ocstore) and virtual hosting with **ocStore 3.0.3.7 + PHP 7.3**. It integrates into the admin panel, adding a menu item called "Image Cleanup" to initiate the scanning and deletion of unused images.
 
 <img src="https://raw.githubusercontent.com/webitproff/oc-image_cleaner/refs/heads/main/Image-Cleaner-Utility.webp" alt="Image Cleaner Utility for ocStore / OpenCart">
 
@@ -334,7 +334,7 @@ ___
 ## Общая информация
 
 **Image Cleaner** — это бесплатный модуль для ocStore/OpenCart, предназначенный для поиска и удаления неиспользуемых изображений из папки `/image/catalog/`. Этот модуль помогает поддерживать ваш сайт оптимизированным, освобождая дисковое пространство, удаляя изображения, которые не используются на сайте, например, не привязанные к товарам, категориям, баннерам, производителям, информационным страницам или блогам. 
-Модуль десятки раз проверялся на работем сайте на локальном сервере и виртуальном хостинге в паре **ocStore 3.0.3.7 + PHP 7.3**.
+Модуль десятки раз проверялся на работем сайте на [локальном сервере](https://abuyfile.com/ru/usersblog/open-server-6-and-opencart-ocstore) и виртуальном хостинге в паре **ocStore 3.0.3.7 + PHP 7.3**.
 
 Модуль интегрируется в административную панель и добавляет пункт меню «Уборка в картинках», через который можно запускать проверку и удаление неиспользуемых изображений.
 
