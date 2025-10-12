@@ -1,4 +1,9 @@
-# Image Cleaner для ocStore / OpenCart
+# Image Cleaner Utility для ocStore / OpenCart
+
+[![Лицензия](https://img.shields.io/badge/лицензия-BSD-blue.svg)](https://github.com/webitproff/oc-image_cleaner/blob/main/LICENSE)
+[![Версия](https://img.shields.io/badge/версия-2.0.1-green.svg)](https://github.com/webitproff/oc-image_cleaner/releases)
+[![Совместимость с ocStore](https://img.shields.io/badge/ocStore-3.0.3.7-orange.svg)](https://ocstore.com/)
+[![PHP](https://img.shields.io/badge/PHP-7.3-blueviolet.svg)](https://www.php.net/releases/7_3_0.php)
 
 ## Общая информация
 
@@ -65,31 +70,33 @@ $this->load->language('common/column_left');
 
 * После неё добавьте следующий код:
 ```php
-$this->load->language('tool/image_cleaner'); // строка загрузки языковой локализации image_cleaner
+$this->load->language('tool/image_cleaner'); // строка загрузки языковой локализации image_cleaner (Загружает переводы для модуля) 
 ```
-* Найдите массив с кодом (пункт меню):
+* Найдите массив $data['menus'][] (это список пунктов меню админки). После первого пункта (обычно Dashboard, Панель стану, Панель состояния)::
 
 ```php
-			// Menu
-			$data['menus'][] = array(
-				'id'       => 'menu-dashboard',
-				'icon'	   => 'fa-dashboard',
-				'name'	   => $this->language->get('text_dashboard'),
-				'href'     => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
-				'children' => array()
-			);
+// Menu
+$data['menus'][] = array(
+	'id'       => 'menu-dashboard',
+	'icon'	   => 'fa-dashboard',
+	'name'	   => $this->language->get('text_dashboard'),
+	'href'     => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
+	'children' => array()
+);
 ```
 
 * После неё добавьте следующий код:
 ```php
 
+// start пункт меню утилиты image_cleaner
 $data['menus'][] = array(
-    'id'       => 'menu-tool-image-cleaner',
-    'icon'     => 'fa fa-trash-o',
-    'name'     => $this->language->get('image_cleaner_title'),
-    'href'     => $this->url->link('tool/image_cleaner', 'user_token=' . $this->session->data['user_token'], true),
-    'children' => array()
+	'id'       => 'menu-tool-image-cleaner',
+	'icon'     => 'fa fa-trash-o',
+	'name'	   => $this->language->get('image_cleaner_title'),
+	'href'     => $this->url->link('tool/image_cleaner', 'user_token=' . $this->session->data['user_token'], true),
+	'children' => array()
 );
+// end пункт меню утилиты image_cleaner
 ```
 
 * Это добавит пункт меню "Уборка в картинках" с иконкой корзины в левую колонку админки.
