@@ -145,6 +145,10 @@ To make the module visible and functional, assign permissions:
 - Clear both the system cache and template cache.
 
 ## Using the Module
+
+<img src="https://raw.githubusercontent.com/webitproff/oc-image_cleaner/refs/heads/main/module-image-cleaner-utility-ocstore-opencart_2025-10-12_002.webp" alt="Image Cleaner Utility for ocStore / OpenCart">
+
+
 ### 1. Accessing the Module
 - In the admin panel, locate the "Image Cleanup" menu item.
 - Click it to open the module interface.
