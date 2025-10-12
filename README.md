@@ -86,6 +86,9 @@ Follow these steps to ensure the module works correctly, even if you're a comple
 
 ### 3. Adding the Menu Item to the Admin Panel
 - Open the file `admin/controller/common/column_left.php`.
+
+<img src="https://raw.githubusercontent.com/webitproff/oc-image_cleaner/refs/heads/main/module-image-cleaner-utility-ocstore-opencart_2025-10-12_006.webp" alt="Image Cleaner Utility for ocStore / OpenCart">
+
 - Locate the line:
   ```php
   $this->load->language('common/column_left');
