@@ -1,0 +1,56 @@
+<!-- 
+шаблон утилиты в админке image_cleaner.twig 
+admin/view/template/tool/image_cleaner.twig  
+-->
+
+{{ header }}
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a href="{{ scan_url }}" class="btn btn-info"><i class="fa fa-search"></i> {{ text_check }}</a>
+        <a href="{{ delete_url }}" class="btn btn-danger" onclick="return confirm('{{ text_warning }}');"><i class="fa fa-trash-o"></i> {{ text_delete }}</a>
+      </div>
+      <h1><i class="fa fa-trash-o"></i> {{ heading_title }}</h1>
+      <p class="help-block">{{ text_help }}</p>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-picture-o"></i> {{ text_results }}</h3>
+      </div>
+      <div class="panel-body">
+        {% if results %}
+          {# Если есть текст с результатами (например, количество найденных или удалённых файлов) #}
+          {% if text_results_count %}
+            <p>{{ text_results_count }}</p>
+          {% else %}
+            {# Если нет специального текста, выводим количество найденных файлов #}
+            <p>{{ text_found|format(results|length) }}</p>
+          {% endif %}
+
+          {# Список файлов, если он есть #}
+          <pre style="max-height: 400px; overflow: auto;">{{ results|join("\n") }}</pre>
+        {% else %}
+          {# Если не найдено файлов, показываем локализованное сообщение "Нет неиспользуемых изображений" #}
+          <p>{{ text_no_results }}</p>
+        {% endif %}
+        <hr />
+        {# Информационное предупреждение о бэкапе #}
+        <div class="alert alert-info">{{ text_backup|raw }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        {{ image_cleaner_github }}
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}
