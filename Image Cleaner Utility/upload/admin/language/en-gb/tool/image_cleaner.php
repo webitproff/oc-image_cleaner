@@ -18,8 +18,9 @@ $_['text_delete']     = 'Delete';
 $_['text_no_results'] = 'No unused images found or scanning not performed.';
 $_['text_found']      = 'Found %s unused images and files.';
 $_['text_deleted']    = 'Files deleted: %s';
-$_['text_backup']     = '<strong>Note:</strong> Before deleting, make a backup of the <code>/image/catalog/</code> folder.';
+$_['text_backup_images']     = '<strong>Note:</strong> Before deleting, make a backup of the <code>/image/catalog/</code> folder.';
 $_['text_help']       = 'Scans the <code>/image/catalog/</code> folder for unused images (not linked to products, categories, banners, manufacturers, or information pages).';
 $_['text_warning']    = 'Delete all unused images? This action is irreversible!';
 $_['text_results']    = 'Scan Results';
+
 $_['image_cleaner_github']   = '<a target="_blank" href="https://github.com/webitproff/oc-image_cleaner">Source Code on GitHub</a>';
