@@ -1,9 +1,10 @@
 # Image Cleaner Utility for ocStore / OpenCart
 ## Unused Image Cleanup Module for ocStore
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/webitproff/oc-image_cleaner/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)]
 [![Version](https://img.shields.io/badge/version-2.0.1-green.svg)](https://github.com/webitproff/oc-image_cleaner/releases)
-[![ocStore Compatibility](https://img.shields.io/badge/ocStore-3.0.3.7-orange.svg)](https://ocstore.com/)
-[![PHP](https://img.shields.io/badge/PHP-7.3-blueviolet.svg)](https://www.php.net/releases/7_3_0.php)
+[![ocStore Compatibility](https://img.shields.io/badge/ocStore-3.0.4.1-orange.svg)]
+[![PHP](https://img.shields.io/badge/PHP-8.4-blueviolet.svg)]
+[![MySQL](https://img.shields.io/badge/MySQL-8.4-blueviolet.svg)]
 
 ## Overview
 **Image Cleaner** is a free module for ocStore/OpenCart designed to locate and delete unused images from the `/image/catalog/` directory. This module helps keep your website optimized by freeing up disk space, removing images that are not linked to products, categories, banners, manufacturers, informational pages, or blogs. 
